@@ -13,13 +13,14 @@ def recipients(request):
 
 @api_view(http_method_names=['GET'])
 def recipient(request, pk):
-    print(pk, type(pk))
     recipients = requests.get('https://stepik.org/media/attachments/course/73594/recipients.json')
     recipients_json = recipients.json()
     response = None
     for recipient in recipients_json:
         if recipient['id'] == pk:
-            response = recipient['info'], recipient['contacts']
+            answer = recipient['info']
+            answer['phoneNumber'] = recipient['contacts']['phoneNumber']
+            response = answer
 
     if response:
         return Response(response)
