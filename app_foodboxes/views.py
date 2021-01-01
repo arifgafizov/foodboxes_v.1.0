@@ -41,7 +41,20 @@ def recipient(request, pk):
 def product_sets(request):
     foodboxes = requests.get('https://stepik.org/media/attachments/course/73594/foodboxes.json')
     foodboxes_json = foodboxes.json()
-    return Response(foodboxes_json)
+    response = []
+
+    for foodbox in foodboxes_json:
+        response_foodbox = {}
+        response_foodbox['title'] = foodbox['name']
+        response_foodbox['description'] = foodbox['about']
+        response_foodbox['price'] = foodbox['price']
+        response_foodbox['weight'] = foodbox['weight_grams']
+        response.append(response_foodbox)
+
+    if response:
+        return Response(response)
+    else:
+        return Response(status=status.HTTP_404_NOT_FOUND)
 
 
 @api_view(http_method_names=['GET'])
