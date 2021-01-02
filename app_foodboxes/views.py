@@ -1,6 +1,6 @@
 import requests
-from rest_framework import status
 
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -41,7 +41,7 @@ def recipient(request, pk):
 def product_sets(request):
     foodboxes = requests.get('https://stepik.org/media/attachments/course/73594/foodboxes.json')
     foodboxes_json = foodboxes.json()
-    response = []
+    response_foodboxes = []
 
     for foodbox in foodboxes_json:
         response_foodbox = {}
@@ -49,10 +49,27 @@ def product_sets(request):
         response_foodbox['description'] = foodbox['about']
         response_foodbox['price'] = foodbox['price']
         response_foodbox['weight'] = foodbox['weight_grams']
-        response.append(response_foodbox)
+        response_foodboxes.append(response_foodbox)
 
-    if response:
-        return Response(response)
+    if response_foodboxes:
+        result = []
+        if request.query_params:
+            price = request.query_params.get('min_price')
+#            weight = request.query_params.get('min_weight')
+            if not price:
+                return Response(status=status.HTTP_400_BAD_REQUEST)
+            #if not weight:
+            #    return Response(status=status.HTTP_400_BAD_REQUEST)
+
+            for response in response_foodboxes:
+                if response['price'] >= int(price):
+                    result.append(response)
+                #elif response['weight'] >= int(weight):
+                 #   result.append(response)
+
+        else:
+            result = response_foodboxes
+        return Response(result)
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
