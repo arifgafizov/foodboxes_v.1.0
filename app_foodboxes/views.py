@@ -54,18 +54,19 @@ def product_sets(request):
     if response_foodboxes:
         result = []
         if request.query_params:
-            price = request.query_params.get('min_price')
-#            weight = request.query_params.get('min_weight')
-            if not price:
+            min_price = request.query_params.get('min_price')
+            min_weight = request.query_params.get('min_weight')
+
+            if (not min_price) and (not min_weight):
                 return Response(status=status.HTTP_400_BAD_REQUEST)
-            #if not weight:
-            #    return Response(status=status.HTTP_400_BAD_REQUEST)
 
             for response in response_foodboxes:
-                if response['price'] >= int(price):
-                    result.append(response)
-                #elif response['weight'] >= int(weight):
-                 #   result.append(response)
+                if min_price:
+                    if response['price'] >= int(min_price):
+                        result.append(response)
+                if min_weight:
+                    if response['weight'] >= int(min_weight):
+                        result.append(response)
 
         else:
             result = response_foodboxes
