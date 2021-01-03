@@ -7,16 +7,20 @@ from rest_framework.response import Response
 @api_view(http_method_names=['GET'])
 def recipients(request):
     recipients = requests.get('https://stepik.org/media/attachments/course/73594/recipients.json')
-    recipients_json = recipients.json()
-    response = []
+    if recipients:
+        recipients_json = recipients.json()
+        response = []
 
-    for recipient in recipients_json:
-        response_recipient = recipient['info']
-        response_recipient['phoneNumber'] = recipient['contacts']['phoneNumber']
-        response.append(response_recipient)
+        for recipient in recipients_json:
+            response_recipient = recipient['info']
+            response_recipient['phoneNumber'] = recipient['contacts']['phoneNumber']
+            response.append(response_recipient)
 
-    if response:
         return Response(response)
+
+    elif recipients.status_code == 408:
+        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -24,15 +28,19 @@ def recipients(request):
 @api_view(http_method_names=['GET'])
 def recipient(request, pk):
     recipients = requests.get('https://stepik.org/media/attachments/course/73594/recipients.json')
-    recipients_json = recipients.json()
-    response = None
-    for recipient in recipients_json:
-        if recipient['id'] == pk:
-            response = recipient['info']
-            response['phoneNumber'] = recipient['contacts']['phoneNumber']
+    if recipients:
+        recipients_json = recipients.json()
+        response = None
+        for recipient in recipients_json:
+            if recipient['id'] == pk:
+                response = recipient['info']
+                response['phoneNumber'] = recipient['contacts']['phoneNumber']
 
-    if response:
         return Response(response)
+
+    elif recipients.status_code == 408:
+        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -40,18 +48,18 @@ def recipient(request, pk):
 @api_view(http_method_names=['GET'])
 def product_sets(request):
     foodboxes = requests.get('https://stepik.org/media/attachments/course/73594/foodboxes.json')
-    foodboxes_json = foodboxes.json()
-    response_foodboxes = []
+    if foodboxes:
+        foodboxes_json = foodboxes.json()
+        response_foodboxes = []
 
-    for foodbox in foodboxes_json:
-        response_foodbox = {}
-        response_foodbox['title'] = foodbox['name']
-        response_foodbox['description'] = foodbox['about']
-        response_foodbox['price'] = foodbox['price']
-        response_foodbox['weight'] = foodbox['weight_grams']
-        response_foodboxes.append(response_foodbox)
+        for foodbox in foodboxes_json:
+            response_foodbox = {}
+            response_foodbox['title'] = foodbox['name']
+            response_foodbox['description'] = foodbox['about']
+            response_foodbox['price'] = foodbox['price']
+            response_foodbox['weight'] = foodbox['weight_grams']
+            response_foodboxes.append(response_foodbox)
 
-    if response_foodboxes:
         result = []
         if request.query_params:
             min_price = request.query_params.get('min_price')
@@ -67,10 +75,14 @@ def product_sets(request):
                 if min_weight:
                     if response['weight'] >= int(min_weight):
                         result.append(response)
-
         else:
             result = response_foodboxes
+
         return Response(result)
+
+    elif foodboxes.status_code == 408:
+        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -78,16 +90,20 @@ def product_sets(request):
 @api_view(http_method_names=['GET'])
 def product_set(request, pk):
     foodboxes = requests.get('https://stepik.org/media/attachments/course/73594/foodboxes.json')
-    foodboxes_json = foodboxes.json()
-    response = {}
-    for foodbox in foodboxes_json:
-        if foodbox['inner_id'] == pk:
-            response['title'] = foodbox['name']
-            response['description'] = foodbox['about']
-            response['price'] = foodbox['price']
-            response['weight'] = foodbox['weight_grams']
+    if foodboxes:
+        foodboxes_json = foodboxes.json()
+        response = {}
+        for foodbox in foodboxes_json:
+            if foodbox['inner_id'] == pk:
+                response['title'] = foodbox['name']
+                response['description'] = foodbox['about']
+                response['price'] = foodbox['price']
+                response['weight'] = foodbox['weight_grams']
 
-    if response:
         return Response(response)
+
+    elif foodboxes.status_code == 408:
+        return Response(status=status.HTTP_408_REQUEST_TIMEOUT)
+
     else:
         return Response(status=status.HTTP_404_NOT_FOUND)
